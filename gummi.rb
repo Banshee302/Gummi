@@ -8,8 +8,9 @@ require 'rubygems/package'
 
 # Configuration
 INDEX_URL = 'https://raw.githubusercontent.com/banshee302/gmakepackageindex.org/main/index.json'
-PLUGIN_DIR = File.expand_path('../plugins', __dir__)
+PLUGIN_DIR = File.expand_path('.', __dir__)   # root directory
 LOCAL_INDEX = File.expand_path('local_index.json', __dir__)
+
 
 # Fetch the remote package index
 def fetch_index
