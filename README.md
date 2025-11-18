@@ -21,4 +21,8 @@ To update the local package database, type in ruby gummi.rb index, this will dow
 
 to install, you can type in ruby gummi.rb get <packagename>, this will check the index for a package entry with the name of it, checks the path and downloads it from the remote package mirror.
 
+# For Developers
+
+You can port your Package very easily to Gummi and make it compliant with the Package Manager, just put the gummi.rb script in your Package directory, type in "ruby gummi.rb mkpkg" and it will create a skeleton JSON Package instruction file, edit it to fit your Project, and then ship it out to Gummi Package Index via GitHub Issues as I said above.
+
 
