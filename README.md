@@ -25,4 +25,7 @@ to install, you can type in ruby gummi.rb get <packagename>, this will check the
 
 You can port your Package very easily to Gummi and make it compliant with the Package Manager, just put the gummi.rb script in your Package directory, type in "ruby gummi.rb mkpkg" and it will create a skeleton JSON Package instruction file, edit it to fit your Project, and then ship it out to Gummi Package Index via GitHub Issues as I said above.
 
+For extensive development with Gummi documetation, check the Gummi Wiki for Developers!
+> https://github.com/Banshee302/Gummi/wiki
+
 
