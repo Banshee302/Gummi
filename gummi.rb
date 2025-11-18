@@ -10,6 +10,7 @@ require 'rubygems/package'
 INDEX_URL = 'https://raw.githubusercontent.com/banshee302/gmakepackageindex.org/main/index.json'
 PLUGIN_DIR = File.expand_path('.', __dir__)   # root directory
 LOCAL_INDEX = File.expand_path('local_index.json', __dir__)
+INSTRUCTIONS_FILE = File.expand_path('instructions.json', __dir__)
 
 
 # Fetch the remote package index
@@ -76,6 +77,56 @@ def get_package(name)
   end
 end
 
+# Build Instructions etc
+
+def resolve_instructions(file_path)
+  unless File.exist?(file_path)
+    puts ">> No Instructions Found, resolving Deltas.."
+    return
+  end
+
+  puts ">> Resolving Packages.."
+
+  begin
+    instructions = JSON.parse(File.read(file_path))
+
+    # Package metadata
+    package_name = instructions["packageName"]
+    package_version = instructions["pkgversion"]
+    license = instructions["license"]
+
+    puts ">> Package: #{package_name} (v#{package_version})"
+    puts ">> License: #{license}" if license
+
+    # Handle installs
+    if instructions["installs"]
+      puts ">> Installing dependencies..."
+      instructions["installs"].each do |dep|
+        puts "   - Installing #{dep} via gummi..."
+        # Here you’d call your package manager logic, e.g. get_package(dep)
+        get_package(dep)
+      end
+    else
+      puts ">> No dependencies listed."
+    end
+
+    # Handle commands
+    if instructions["cmds"]
+      puts ">> Executing setup commands..."
+      instructions["cmds"].each do |cmd|
+        puts "   - Would execute: #{cmd}"
+        # For safety, you might prompt the host before actually running:
+        # system(cmd) if confirm("Run command #{cmd}?")
+      end
+    else
+      puts ">> No setup commands listed."
+    end
+
+  rescue JSON::ParserError => e
+    puts "ERR: Failed to parse instructions.json — #{e}"
+  end
+end
+
 # Entry point
 def main
   puts "Gummi Multiplatform Package Manager"
@@ -84,16 +135,32 @@ def main
   when 'get'
     pkg = ARGV[1]
     if pkg.nil?
-      puts "Usage: ruby main.rb get <packagename>"
+      puts "Usage: ruby gummi.rb get <packagename>"
     else
       get_package(pkg)
+      resolve_instructions(INSTRUCTIONS_FILE)
     end
+
   when 'index'
     update_local_index
+
+  when 'mkpkg'
+    dummy = {
+      "packageName" => "dummy-package",
+      "pkgversion"  => "0.1.0",
+      "license"     => "MIT",
+      "installs"    => ["dep1", "dep2"],
+      "cmds"        => ["echo 'Hello from dummy package!'"]
+    }
+
+    File.write(INSTRUCTIONS_FILE, JSON.pretty_generate(dummy))
+    puts ">> Dummy instructions.json created at #{INSTRUCTIONS_FILE}, we reccomend editing it to match your Package."
+
   else
     puts "Usage:"
     puts "  ruby gummi.rb get <packagename>"
     puts "  ruby gummi.rb index"
+    puts "  ruby gummi.rb mkpkg"
   end
 end
 
